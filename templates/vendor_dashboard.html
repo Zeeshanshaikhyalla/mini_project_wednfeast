@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Vendor Dashboard | Wed n Feast{% endblock %}
+
+{% block content %}
+<div class="dashboard-header text-white bg-dark section pt-5 pb-5">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Vendor Dashboard</h1>
+            <p class="mb-0">Manage your listings, view booking requests, and grow your business.</p>
+        </div>
+        <div>
+            <button class="btn btn-gold text-dark" onclick="document.getElementById('addVenueModal').style.display='flex'">+ Add New Venue</button>
+        </div>
+    </div>
+</div>
+
+<section class="section bg-light min-vh-50">
+    <div class="container">
+        
+        <!-- Stats Row -->
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="glass-panel p-4 text-center">
+                    <h2 class="text-primary" style="font-size: 2.5rem;">{{ bookings|length }}</h2>
+                    <p class="text-muted mb-0">Total Bookings</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-panel p-4 text-center">
+                    <h2 class="text-primary" style="font-size: 2.5rem;">{{ venues|length }}</h2>
+                    <p class="text-muted mb-0">Active Venues</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-panel p-4 text-center">
+                    <h2 class="text-primary" style="font-size: 2.5rem;">{{ caterers|length }}</h2>
+                    <p class="text-muted mb-0">Catering Services</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left Col: Listings -->
+            <div class="col-lg-7">
+                <h3 class="mb-4 d-flex align-items-center"><span class="mr-2">🏢</span> My Listings</h3>
+                
+                {% if venues %}
+                    <h4 class="mb-3 text-muted">Venues</h4>
+                    {% for v in venues %}
+                    <div class="glass-panel mb-3 p-3 row align-items-center">
+                        <div class="vendor-listing-info flex-grow-1">
+                            <h4 class="mb-1">{{ v.name }} <span class="badge badge-light text-muted">{{ v.rating }} ★</span></h4>
+                            <p class="text-sm text-muted mb-0">{{ v.city_name }} • {{ v.capacity }} pax • ₹{{ "{:,.0f}".format(v.price_per_day) }}/day</p>
+                        </div>
+                        <div class="vendor-listing-action">
+                            <a href="{{ url_for('venues.venue_detail', venue_id=v.id) }}" class="btn btn-outline-sm">View</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if caterers %}
+                    <h4 class="mb-3 text-muted mt-5">Catering Services</h4>
+                    {% for c in caterers %}
+                    <div class="glass-panel mb-3 p-3 row align-items-center">
+                        <div class="vendor-listing-info flex-grow-1">
+                            <h4 class="mb-1">{{ c.name }} <span class="badge badge-light text-muted">{{ c.rating }} ★</span></h4>
+                            <p class="text-sm text-muted mb-0">{{ c.city_name }} • ₹{{ "{:,.0f}".format(c.price_per_plate_veg) }}/plate (veg)</p>
+                        </div>
+                        <div class="vendor-listing-action">
+                            <a href="{{ url_for('catering.catering_detail', caterer_id=c.id) }}" class="btn btn-outline-sm">View</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if not venues and not caterers %}
+                <div class="glass-panel p-4 text-center">
+                    <p class="text-muted mb-3">You don't have any listings yet.</p>
+                    <button class="btn btn-primary-sm" onclick="document.getElementById('addVenueModal').style.display='flex'">Create Your First Listing</button>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Col: Booking Requests -->
+            <div class="col-lg-5 pl-lg-4 mt-5 mt-lg-0">
+                <h3 class="mb-4 d-flex align-items-center"><span class="mr-2">🔔</span> Booking Requests</h3>
+                
+                {% if bookings %}
+                    {% for b in bookings %}
+                    <div class="glass-panel mb-4 p-4 border-left-indicator status-{{ b.status }}">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge badge-outline text-xs">{{ b.booking_type|upper }}</span>
+                            <span class="status-badge status-{{ b.status }}">{{ b.status|title }}</span>
+                        </div>
+                        <h4 class="mb-1">{{ b.client_name }}</h4>
+                        <p class="text-sm text-muted mb-3">📞 {{ b.client_phone }}</p>
+
+                        <div class="bg-light p-3 rounded mb-3 text-sm">
+                            <p class="mb-1"><strong>For:</strong> {% if b.venue_name %}{{ b.venue_name }}{% else %}{{ b.catering_name }}{% endif %}</p>
+                            <p class="mb-1"><strong>Date:</strong> {{ b.event_date }}</p>
+                            <p class="mb-1"><strong>Guests:</strong> {{ b.guests }} ({{ b.event_type }})</p>
+                            {% if b.special_requests %}
+                            <p class="mb-0 mt-2 text-primary"><em>"{{ b.special_requests }}"</em></p>
+                            {% endif %}
+                        </div>
+
+                        {% if b.status == 'pending' %}
+                        <div class="d-flex gap-2">
+                            <form action="{{ url_for('vendors.confirm_booking', booking_id=b.id) }}" method="POST" class="flex-grow-1 mr-2">
+                                <button type="submit" class="btn btn-success btn-block btn-sm">Confirm</button>
+                            </form>
+                            <form action="{{ url_for('vendors.reject_booking', booking_id=b.id) }}" method="POST" class="flex-grow-1" onsubmit="return confirm('Reject this booking?');">
+                                <button type="submit" class="btn btn-outline border-danger text-danger btn-block btn-sm">Reject</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="glass-panel p-4 text-center text-muted">
+                        No booking requests yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add Venue Modal -->
+<div id="addVenueModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content glass-panel" style="max-width: 600px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Add New Venue</h3>
+            <button onclick="document.getElementById('addVenueModal').style.display='none'" class="btn-close text-xl border-0 bg-transparent cursor-pointer">×</button>
+        </div>
+        
+        <form action="{{ url_for('vendors.add_venue') }}" method="POST">
+            <div class="form-group mb-3">
+                <label>Venue Name *</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            
+            <div class="form-row mb-3">
+                <div class="form-group w-50 mr-3">
+                    <label>City *</label>
+                    <select name="city_id" class="form-control" required>
+                        {% for city in cities %}
+                            <option value="{{ city.id }}">{{ city.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group w-50">
+                    <label>Venue Type</label>
+                    <select name="venue_type" class="form-control">
+                        <option value="banquet_hall">Banquet Hall</option>
+                        <option value="hotel">Hotel</option>
+                        <option value="open_lawn">Open Lawn</option>
+                        <option value="marriage_hall">Marriage Hall</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label>Description</label>
+                <textarea name="description" class="form-control" rows="3"></textarea>
+            </div>
+            
+            <div class="form-row mb-3">
+                <div class="form-group w-50 mr-3">
+                    <label>Max Capacity (pax)</label>
+                    <input type="number" name="capacity" class="form-control" value="100">
+                </div>
+                <div class="form-group w-50">
+                    <label>Rental Price / Day (₹)</label>
+                    <input type="number" name="price_per_day" class="form-control" value="50000">
+                </div>
+            </div>
+            
+            <div class="form-group mb-4">
+                <label>Amenities (comma separated)</label>
+                <input type="text" name="amenities" class="form-control" placeholder="e.g. Parking, AC, WiFi, Stage">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Create Venue Listing</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6); z-index: 1000;
+    justify-content: center; align-items: center; padding: 20px;
+}
+.border-left-indicator { border-left: 4px solid var(--gray-medium); }
+.border-left-indicator.status-pending { border-left-color: var(--warning); }
+.border-left-indicator.status-confirmed { border-left-color: var(--success); }
+.border-left-indicator.status-cancelled { border-left-color: var(--danger); }
+</style>
+{% endblock %}

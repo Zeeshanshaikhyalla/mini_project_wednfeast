@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Wed n Feast – Your Dream Event Starts Here{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="hero glass-hero">
+    <div class="container hero-content">
+        <h1 class="hero-title">Plan Your Perfect <br><span class="accent typing-text">Celebration</span></h1>
+        <p class="hero-subtitle">Discover premium venues and exquisite catering services across India in one single
+            place.</p>
+
+        <div class="hero-search-box glass-panel">
+            <form action="{{ url_for('venues.list_venues') }}" class="search-form" method="GET">
+                <div class="form-group-inline">
+                    <label for="city_id">Where?</label>
+                    <select name="city_id" id="city_id" class="form-control" required>
+                        <option value="" disabled selected>Select City</option>
+                        {% for city in cities %}
+                        <option value="{{ city.id }}">{{ city.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group-inline">
+                    <label for="venue_type">What?</label>
+                    <select name="venue_type" id="venue_type" class="form-control">
+                        <option value="">Any Venue Type</option>
+                        <option value="hotel">4/5 Star Hotel</option>
+                        <option value="banquet_hall">Banquet Hall</option>
+                        <option value="open_lawn">Open Lawn</option>
+                        <option value="marriage_hall">Marriage Hall</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-gold btn-large search-btn">Search Venues ➔</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- CITIES SECTION -->
+<section class="section cities-section">
+    <div class="container">
+        <h2 class="section-title text-center">Popular Destinations</h2>
+        <p class="section-subtitle text-center">Find the perfect backdrop in your favorite city</p>
+
+        <div class="city-grid">
+            {% for city in cities %}
+            <a href="{{ url_for('venues.list_venues', city_id=city.id) }}" class="city-card">
+                <img src="{{ city.image_url }}" alt="{{ city.name }}" class="city-img"
+                    onerror="this.src='/static/images/' + '{{ city.name }}'.toLowerCase() + '.jpg'">
+                <div class="city-overlay">
+                    <h3 class="city-name">{{ city.name }}</h3>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED VENUES -->
+<section class="section featured-section bg-light">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Top Rated Venues</h2>
+                <p class="section-subtitle">Handpicked locations for unforgettable moments</p>
+            </div>
+            <a href="{{ url_for('venues.list_venues') }}" class="btn btn-outline">View All</a>
+        </div>
+
+        <div class="card-grid">
+            {% for venue in featured_venues %}
+            <div class="card glass-card">
+                <div class="card-img-container">
+                    <img src="{{ venue.image1 or url_for('static', filename='images/venues/' + venue.name + '.jpg') }}"
+                        alt="{{ venue.name }}" class="card-img">
+                    <div class="card-badge">{{ venue.rating }} ★ ({{ venue.review_count }})</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="meta-item">📍 {{ venue.city_name }}</span>
+                        <span class="meta-item">👥 {{ venue.capacity }} pax</span>
+                    </div>
+                    <h3 class="card-title">{{ venue.name }}</h3>
+                    <p class="card-price">₹{{ "{:,.0f}".format(venue.price_per_day) }} <span class="price-suffix">/
+                            day</span></p>
+                    <a href="{{ url_for('venues.venue_detail', venue_id=venue.id) }}"
+                        class="btn btn-primary-sm btn-block">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED CATERING -->
+<section class="section featured-section">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Exquisite Catering</h2>
+                <p class="section-subtitle">Culinary experiences curated by top chefs</p>
+            </div>
+            <a href="{{ url_for('catering.list_catering') }}" class="btn btn-outline">View All</a>
+        </div>
+
+        <div class="card-grid">
+            {% for cat in featured_caterers %}
+            <div class="card glass-card">
+                <div class="card-img-container">
+                    <img src="{{ cat.image1 or url_for('static', filename='images/placeholder_catering.png') }}"
+                        alt="{{ cat.name }}" class="card-img">
+                    <div class="card-badge">{{ cat.rating }} ★ ({{ cat.review_count }})</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="meta-item">📍 {{ cat.city_name }}</span>
+                    </div>
+                    <h3 class="card-title">{{ cat.name }}</h3>
+                    <p class="card-cuisines text-muted text-sm truncate-2">{{ cat.cuisines }}</p>
+                    <p class="card-price">₹{{ "{:,.0f}".format(cat.price_per_plate_veg) }} <span class="price-suffix">/
+                            veg plate</span></p>
+                    <a href="{{ url_for('catering.catering_detail', caterer_id=cat.id) }}"
+                        class="btn btn-primary-sm btn-block">View Menu</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-it-works bg-primary-dark text-white">
+    <div class="container">
+        <h2 class="section-title text-center" style="color:var(--cream)">How Wed n Feast Works</h2>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon">1</div>
+                <h3>Discover</h3>
+                <p>Browse thousands of verified venues and catering services tailored to your budget and style.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">2</div>
+                <h3>Compare</h3>
+                <p>Review transparent pricing, detailed menus, realistic photos, and honest customer reviews.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">3</div>
+                <h3>Book</h3>
+                <p>Secure your dates instantly with our streamlined booking engine and enjoy peace of mind.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

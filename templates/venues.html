@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Discover Venues | Wed n Feast{% endblock %}
+
+{% block content %}
+<div class="page-header text-center">
+    <div class="container">
+        <h1>Discover Premium Venues</h1>
+        <p>Find the perfect setting for your celebration.</p>
+    </div>
+</div>
+
+<section class="section listing-section">
+    <div class="container listing-layout">
+        
+        <!-- SIDEBAR FILTER -->
+        <aside class="filter-sidebar glass-panel">
+            <h3>Filters</h3>
+            <form action="{{ url_for('venues.list_venues') }}" method="GET" id="filterForm">
+                
+                <div class="form-group">
+                    <label>City</label>
+                    <select name="city_id" class="form-control" onchange="this.form.submit()">
+                        <option value="">All Cities</option>
+                        {% for city in cities %}
+                            <option value="{{ city.id }}" {% if selected_city == city.id %}selected{% endif %}>{{ city.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Venue Type</label>
+                    <div class="radio-group-vertical mt-2">
+                        <label class="radio-label">
+                            <input type="radio" name="venue_type" value="" {% if not selected_type %}checked{% endif %} onchange="this.form.submit()"> All Types
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="venue_type" value="hotel" {% if selected_type == 'hotel' %}checked{% endif %} onchange="this.form.submit()"> Premium Hotel (4/5 Star)
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="venue_type" value="banquet_hall" {% if selected_type == 'banquet_hall' %}checked{% endif %} onchange="this.form.submit()"> Banquet Hall
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="venue_type" value="open_lawn" {% if selected_type == 'open_lawn' %}checked{% endif %} onchange="this.form.submit()"> Open Lawn / Farm
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="venue_type" value="marriage_hall" {% if selected_type == 'marriage_hall' %}checked{% endif %} onchange="this.form.submit()"> Marriage Hall
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Minimum Capacity: <span id="capValue">{{ min_cap or 100 }}</span> pax</label>
+                    <input type="range" name="min_capacity" min="50" max="2000" step="50" class="range-slider" 
+                           value="{{ min_cap or 100 }}" oninput="document.getElementById('capValue').innerText=this.value" onchange="this.form.submit()">
+                </div>
+
+                <div class="form-group">
+                    <label>Max Price / Day: ₹<span id="priceValue">{{ max_price or 500000 }}</span></label>
+                    <input type="range" name="max_price" min="50000" max="1000000" step="10000" class="range-slider" 
+                           value="{{ max_price or 500000 }}" oninput="document.getElementById('priceValue').innerText=this.value" onchange="this.form.submit()">
+                </div>
+                
+                <a href="{{ url_for('venues.list_venues') }}" class="text-sm mt-3 d-block text-muted">Clear Filters</a>
+            </form>
+        </aside>
+
+        <!-- MAIN RESULTS -->
+        <main class="results-main">
+            <div class="results-header">
+                <h2>{{ venues|length }} Venues Found</h2>
+            </div>
+            
+            {% if venues %}
+            <div class="card-grid">
+                {% for venue in venues %}
+                <div class="card glass-card fade-in">
+                    <div class="card-img-container">
+                        <img src="{{ venue.image1 or url_for('static', filename='images/placeholder_venue.png') }}" alt="{{ venue.name }}" class="card-img">
+                        <div class="card-badge">{{ venue.rating }} ★</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <span class="meta-item">📍 {{ venue.city_name }}</span>
+                            <span class="meta-item">👥 Upto {{ venue.capacity }}</span>
+                        </div>
+                        <h3 class="card-title">{{ venue.name }}</h3>
+                        <p class="card-desc text-muted truncate-2 mb-2">{{ venue.description }}</p>
+                        <div class="price-row mb-3">
+                            <div class="price-col">
+                                <span class="price-label">Rental</span>
+                                <span class="price-val">₹{{ "{:,.0f}".format(venue.price_per_day) }}</span>
+                            </div>
+                            <div class="price-col">
+                                <span class="price-label">Per Plate</span>
+                                <span class="price-val">₹{{ "{:,.0f}".format(venue.price_per_plate) }}</span>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('venues.venue_detail', venue_id=venue.id) }}" class="btn btn-primary-sm btn-block">View Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No venues found</h3>
+                <p>Try adjusting your filters to see more results.</p>
+                <button onclick="document.getElementById('filterForm').reset(); document.getElementById('filterForm').submit();" class="btn btn-outline mt-3">Clear Filters</button>
+            </div>
+            {% endif %}
+        </main>
+        
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}User Dashboard | Wed n Feast{% endblock %}
+
+{% block content %}
+<div class="dashboard-header text-white bg-primary-dark section text-center pt-5 pb-5">
+    <div class="container">
+        <h1>My Dashboard</h1>
+        <p>Manage all your event bookings in one place.</p>
+    </div>
+</div>
+
+<section class="section bg-light min-vh-50">
+    <div class="container">
+        <h2 class="mb-4">My Bookings</h2>
+        
+        {% if bookings %}
+            <div class="booking-list">
+                {% for b in bookings %}
+                <div class="booking-card-horizontal glass-panel mb-4 p-4 row align-items-center">
+                    <div class="col-booking-info">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge badge-outline mr-2">{{ b.booking_type|upper }}</span>
+                            <span class="status-badge status-{{ b.status }}">{{ b.status|title }}</span>
+                        </div>
+                        <h3 class="mb-1">
+                            {% if b.booking_type == 'venue' %}
+                                {{ b.venue_name }}
+                            {% else %}
+                                {{ b.catering_name }}
+                            {% endif %}
+                        </h3>
+                        <p class="text-muted mb-0"><strong>Event Date:</strong> {{ b.event_date }}</p>
+                        <p class="text-muted"><strong>Guests:</strong> {{ b.guests }} • <strong>Type:</strong> {{ b.event_type }}</p>
+                    </div>
+                    
+                    <div class="col-booking-price text-right">
+                        <p class="text-sm text-muted mb-1">Estimated Total</p>
+                        <h3 class="text-primary mb-3">₹{{ "{:,.0f}".format(b.total_price) }}</h3>
+                        
+                        {% if b.status != 'cancelled' %}
+                        <form action="{{ url_for('bookings.cancel_booking', booking_id=b.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking request?');">
+                            <button type="submit" class="btn btn-outline text-danger border-danger">Cancel Request</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state glass-panel p-5 text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
+                <h3>No Bookings Yet</h3>
+                <p class="text-muted">You haven't made any booking requests. Start exploring venues and caterers for your next event.</p>
+                <div class="mt-4">
+                    <a href="{{ url_for('venues.list_venues') }}" class="btn btn-primary mr-2">Browse Venues</a>
+                    <a href="{{ url_for('catering.list_catering') }}" class="btn btn-gold text-dark">Browse Catering</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

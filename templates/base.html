@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wed n Feast – Your all-in-one wedding and event planning platform. Discover venues, catering services and book seamlessly.">
+    <title>{% block title %}Wed n Feast{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+        <a href="{{ url_for('main.index') }}" class="nav-logo">
+            <span class="logo-icon">💍</span>
+            <span class="logo-text">Wed<span class="accent">n</span>Feast</span>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="{{ url_for('main.index') }}" class="nav-link">Home</a></li>
+            <li><a href="{{ url_for('venues.list_venues') }}" class="nav-link">Venues</a></li>
+            <li><a href="{{ url_for('catering.list_catering') }}" class="nav-link">Catering</a></li>
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == 'vendor' %}
+                    <li><a href="{{ url_for('vendors.dashboard') }}" class="nav-link">My Dashboard</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('bookings.dashboard') }}" class="nav-link">My Bookings</a></li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-sm">Logout</a>
+                </li>
+                <li><span class="nav-greeting">Hi, {{ current_user.name.split()[0] }} 👋</span></li>
+            {% else %}
+                <li><a href="{{ url_for('auth.login') }}" class="nav-link">Login</a></li>
+                <li><a href="{{ url_for('auth.register') }}" class="btn btn-gold-sm">Get Started</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endwith %}
+
+<!-- MAIN CONTENT -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="footer-logo">💍 WednFeast</div>
+                <p>Your all-in-one platform to discover, compare, and book venues and catering services for your perfect celebration.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">📸</a>
+                    <a href="#" class="social-link">🐦</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="{{ url_for('venues.list_venues') }}">Venue Booking</a></li>
+                    <li><a href="{{ url_for('catering.list_catering') }}">Catering Services</a></li>
+                    <li><a href="{{ url_for('auth.register') }}">List Your Business</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">How It Works</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <ul>
+                    <li>📧 hello@wednfeast.com</li>
+                    <li>📞 1800-WED-FEAST</li>
+                    <li>🕒 Mon–Sat, 9 AM–7 PM</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 Wed n Feast. All rights reserved. | Made with ❤️ for Indian Celebrations</p>
+        </div>
+    </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

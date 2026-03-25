@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Booking | Wed n Feast{% endblock %}
+
+{% block content %}
+<div class="page-header text-center bg-light">
+    <div class="container">
+        <h1>Secure Your Booking</h1>
+        <p>You are one step away from making it happen.</p>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container booking-layout">
+        
+        <div class="booking-form-container glass-panel">
+            <h2>Booking Details</h2>
+            <form action="{{ url_for('bookings.book') }}" method="POST" id="bookingForm" class="mt-4">
+                
+                {% if venue %}
+                    <input type="hidden" name="booking_type" value="venue">
+                    <input type="hidden" name="venue_id" value="{{ venue.id }}">
+                    <div class="booking-summary-box mb-4 p-3 bg-light rounded">
+                        <h4>Booking: <span class="text-primary">{{ venue.name }}</span></h4>
+                        <p class="text-sm text-muted mt-1">Venue Rental: ₹{{ "{:,.0f}".format(venue.price_per_day) }} / day</p>
+                    </div>
+                {% elif caterer %}
+                    <input type="hidden" name="booking_type" value="catering">
+                    <input type="hidden" name="catering_id" value="{{ caterer.id }}">
+                    <div class="booking-summary-box mb-4 p-3 bg-light rounded" style="border-left: 4px solid var(--gold);">
+                        <h4>Booking: <span style="color:var(--gold-dark);">{{ caterer.name }}</span></h4>
+                        <p class="text-sm text-muted mt-1">Starting at ₹{{ "{:,.0f}".format(caterer.price_per_plate_veg) }} / plate (Veg)</p>
+                    </div>
+                {% endif %}
+
+                <div class="form-row">
+                    <div class="form-group w-50">
+                        <label for="event_date">Event Date *</label>
+                        <input type="date" id="event_date" name="event_date" class="form-control" required min="{{ current_date }}">
+                    </div>
+                    <div class="form-group w-50">
+                        <label for="event_type">Event Type *</label>
+                        <select id="event_type" name="event_type" class="form-control" required>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Reception">Reception</option>
+                            <option value="Engagement">Engagement</option>
+                            <option value="Corporate Event">Corporate Event</option>
+                            <option value="Birthday Party">Birthday Party</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="guests">Expected Number of Guests *</label>
+                    <input type="number" id="guests" name="guests" class="form-control" required min="50" max="5000" value="100">
+                    <small class="text-muted d-block mt-1">This helps vendors prepare suitable arrangements.</small>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="special_requests">Special Requests / Requirements</label>
+                    <textarea id="special_requests" name="special_requests" class="form-control" rows="4" placeholder="Any specific decorations, menu items, or accessibility needs?"></textarea>
+                </div>
+
+                <div class="booking-terms p-3 bg-light rounded mt-4 mb-4">
+                    <strong>Payment & Confirmation:</strong>
+                    <p class="text-sm mt-2 mb-0 text-muted">Submitting this form does not charge your card. The vendor will contact you to confirm availability and discuss final pricing before any payment is required.</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large btn-block">Confirm Booking Request</button>
+            </form>
+        </div>
+
+        <aside class="booking-sidebar">
+            <div class="glass-panel text-center sticky-sidebar">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+                <h3>Safe & Secure</h3>
+                <p class="text-muted text-sm mt-2">Your information is securely shared only with the selected vendor.</p>
+                <hr class="my-3">
+                <div class="text-left text-sm">
+                    <p>✓ No Hidden Fees</p>
+                    <p>✓ Best Price Guarantee</p>
+                    <p>✓ Verified Vendors Only</p>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+</section>
+{% endblock %}

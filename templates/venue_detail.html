@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ venue.name }} | Wed n Feast{% endblock %}
+
+{% block content %}
+{% set hero_image = venue.image1 or url_for('static', filename='images/placeholder_venue.png') %}
+<section class="detail-hero" 
+    style="background-image: linear-gradient(rgba(45, 27, 61, 0.7), rgba(45, 27, 61, 0.9)), url('{{ hero_image }}');">
+    <div class="container detail-hero-content text-white">
+        <div class="badges mb-3">
+            <span class="badge badge-gold">{{ venue.venue_type|replace('_', ' ')|title }}</span>
+            <span class="badge badge-outline">📍 {{ venue.city_name }}</span>
+            <span class="badge badge-outline">★ {{ venue.rating }} ({{ venue.review_count }} Reviews)</span>
+        </div>
+        <h1 class="detail-title">{{ venue.name }}</h1>
+        <p class="detail-subtitle mb-4">{{ venue.description }}</p>
+        <div class="detail-key-stats">
+            <div class="stat"><span class="stat-icon">👥</span> Max Capacity: {{ venue.capacity }} pax</div>
+            <div class="stat"><span class="stat-icon">₹</span> Rental: ₹{{ "{:,.0f}".format(venue.price_per_day) }} / day</div>
+            <div class="stat"><span class="stat-icon">🍽️</span> Catering: ₹{{ "{:,.0f}".format(venue.price_per_plate) }} / plate</div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container detail-layout">
+
+        <div class="detail-main">
+            <!-- Amenities -->
+            <div class="detail-section glass-panel mb-4">
+                <h2>Amenities</h2>
+                <div class="amenities-grid mt-3">
+                    {% for amenity in venue.amenities.split(',') %}
+                    <div class="amenity-item">
+                        <span class="check-icon">✓</span> {{ amenity.strip() }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Layouts -->
+            <div class="detail-section glass-panel mb-4">
+                <h2>Layout Options</h2>
+                <div class="tags mt-3">
+                    {% for layout in venue.layout_options.split(',') %}
+                    <span class="tag">{{ layout.strip() }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Reviews -->
+            <div class="detail-section glass-panel">
+                <h2>Recent Reviews</h2>
+                {% if reviews %}
+                <div class="reviews-list mt-3">
+                    {% for review in reviews %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <strong>{{ review.user_name }}</strong>
+                            <span class="stars">{% for _ in range(review.rating) %}★{% endfor %}</span>
+                        </div>
+                        <p class="review-text mt-2 text-muted">{{ review.comment }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mt-3">No reviews yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detail-sidebar">
+            <div class="booking-card glass-panel sticky-sidebar">
+                <h3>Book this Venue</h3>
+                <p class="text-sm text-muted mb-4">Select a date to check pricing and availability.</p>
+
+                <form action="{{ url_for('bookings.book') }}" method="GET">
+                    <input type="hidden" name="venue_id" value="{{ venue.id }}">
+                    <button type="submit" class="btn btn-primary btn-block btn-large">Request Booking ➔</button>
+                </form>
+
+                <div class="mt-4 pt-3 border-top">
+                    <h4>Direct Contact</h4>
+                    <p class="text-sm mt-2"><strong>📞</strong> +91-XXXXX-XXXXX (Vendor)</p>
+                    <p class="text-sm">📧 Contact via Platform</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

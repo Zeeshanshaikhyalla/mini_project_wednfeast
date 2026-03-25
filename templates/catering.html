@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Discover Catering | Wed n Feast{% endblock %}
+
+{% block content %}
+<div class="page-header text-center" style="background-color: var(--gold-light);">
+    <div class="container">
+        <h1 style="color: var(--primary-dark);">Exquisite Culinary Experiences</h1>
+        <p style="color: var(--primary-dark);">Find top-rated caterers for a feast your guests will remember.</p>
+    </div>
+</div>
+
+<section class="section listing-section">
+    <div class="container listing-layout">
+        
+        <!-- SIDEBAR FILTER -->
+        <aside class="filter-sidebar glass-panel">
+            <h3>Filters</h3>
+            <form action="{{ url_for('catering.list_catering') }}" method="GET" id="filterForm">
+                
+                <div class="form-group">
+                    <label>City</label>
+                    <select name="city_id" class="form-control" onchange="this.form.submit()">
+                        <option value="">All Cities</option>
+                        {% for city in cities %}
+                            <option value="{{ city.id }}" {% if selected_city == city.id %}selected{% endif %}>{{ city.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Cuisine Speciality</label>
+                    <select name="cuisine" class="form-control" onchange="this.form.submit()">
+                        <option value="">All Cuisines</option>
+                        {% for c in all_cuisines %}
+                            <option value="{{ c }}" {% if selected_cuisine == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Max Price / Veg Plate: ₹<span id="priceValue">{{ max_price or 2000 }}</span></label>
+                    <input type="range" name="max_price" min="300" max="3000" step="100" class="range-slider" 
+                           value="{{ max_price or 2000 }}" oninput="document.getElementById('priceValue').innerText=this.value" onchange="this.form.submit()">
+                </div>
+                
+                <a href="{{ url_for('catering.list_catering') }}" class="text-sm mt-3 d-block text-muted">Clear Filters</a>
+            </form>
+        </aside>
+
+        <!-- MAIN RESULTS -->
+        <main class="results-main">
+            <div class="results-header">
+                <h2>{{ caterers|length }} Caterers Found</h2>
+            </div>
+            
+            {% if caterers %}
+            <div class="card-grid">
+                {% for cat in caterers %}
+                <div class="card glass-card fade-in">
+                    <div class="card-img-container">
+                        <img src="{{ cat.image1 or url_for('static', filename='images/placeholder_catering.png') }}" alt="{{ cat.name }}" class="card-img">
+                        <div class="card-badge">{{ cat.rating }} ★</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <span class="meta-item">📍 {{ cat.city_name }}</span>
+                            <span class="meta-item">👥 Min {{ cat.min_order_persons }} pax</span>
+                        </div>
+                        <h3 class="card-title">{{ cat.name }}</h3>
+                        <p class="card-cuisines text-muted mb-2 text-sm">{{ cat.cuisines }}</p>
+                        
+                        <div class="price-row mb-3">
+                            <div class="price-col">
+                                <span class="price-label bg-green text-xs px-2 py-1 rounded text-white">Veg</span>
+                                <span class="price-val">₹{{ "{:,.0f}".format(cat.price_per_plate_veg) }}</span>
+                            </div>
+                            <div class="price-col">
+                                <span class="price-label bg-red text-xs px-2 py-1 rounded text-white mt-1">Non-Veg</span>
+                                <span class="price-val">₹{{ "{:,.0f}".format(cat.price_per_plate_nonveg) }}</span>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('catering.catering_detail', caterer_id=cat.id) }}" class="btn btn-gold btn-block" style="text-align: center;">View Menu</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No caterers found</h3>
+                <p>Try adjusting your filters to see more results.</p>
+                <button onclick="document.getElementById('filterForm').reset(); document.getElementById('filterForm').submit();" class="btn btn-outline mt-3">Clear Filters</button>
+            </div>
+            {% endif %}
+        </main>
+        
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ caterer.name }} | Wed n Feast{% endblock %}
+
+{% block content %}
+<section class="detail-hero" style="background-image: linear-gradient(rgba(201, 168, 76, 0.85), rgba(45, 27, 61, 0.9)), url('/static/images/placeholder_catering_large.png');">
+    <div class="container detail-hero-content text-white">
+        <div class="badges mb-3">
+            <span class="badge badge-gold">Top Caterer</span>
+            <span class="badge badge-outline">📍 {{ caterer.city_name }}</span>
+            <span class="badge badge-outline">★ {{ caterer.rating }} ({{ caterer.review_count }} Reviews)</span>
+        </div>
+        <h1 class="detail-title">{{ caterer.name }}</h1>
+        <p class="detail-subtitle mb-4">{{ caterer.description }}</p>
+        <div class="detail-key-stats">
+            <div class="stat"><span class="stat-icon">👥</span> Min Order: {{ caterer.min_order_persons }} pax</div>
+            <div class="stat"><span class="stat-icon">🥦</span> Veg: ₹{{ "{:,.0f}".format(caterer.price_per_plate_veg) }} / plate</div>
+            <div class="stat"><span class="stat-icon">🍗</span> Non-Veg: ₹{{ "{:,.0f}".format(caterer.price_per_plate_nonveg) }} / plate</div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container detail-layout">
+        
+        <div class="detail-main">
+            <!-- Menus -->
+            <div class="detail-section glass-panel mb-4">
+                <h2>Sample Menu Options</h2>
+                <div class="menu-tags mb-4">
+                    <strong>Specialties:</strong>
+                    {% for cuisine in caterer.cuisines.split(',') %}
+                    <span class="tag bg-light">{{ cuisine.strip() }}</span>
+                    {% endfor %}
+                </div>
+                
+                <div class="menu-grid">
+                    <div class="menu-category">
+                        <h3>Snacks & Starters</h3>
+                        <ul class="menu-list">
+                            {% for item in caterer.menu_snacks.split(',') %}
+                            <li>{{ item.strip() }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div class="menu-category">
+                        <h3>Main Course</h3>
+                        <ul class="menu-list">
+                            {% for item in caterer.menu_main_course.split(',') %}
+                            <li>{{ item.strip() }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="menu-category">
+                        <h3>Desserts</h3>
+                        <ul class="menu-list">
+                            {% for item in caterer.menu_desserts.split(',') %}
+                            <li>{{ item.strip() }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="menu-category">
+                        <h3>Beverages</h3>
+                        <ul class="menu-list">
+                            {% for item in caterer.menu_beverages.split(',') %}
+                            <li>{{ item.strip() }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews -->
+            <div class="detail-section glass-panel">
+                <h2>Recent Reviews</h2>
+                {% if reviews %}
+                    <div class="reviews-list mt-3">
+                        {% for review in reviews %}
+                        <div class="review-card">
+                            <div class="review-header">
+                                <strong>{{ review.user_name }}</strong>
+                                <span class="stars">{% for _ in range(review.rating) %}★{% endfor %}</span>
+                            </div>
+                            <p class="review-text mt-2 text-muted">{{ review.comment }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mt-3">No reviews yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="detail-sidebar">
+            <div class="booking-card glass-panel sticky-sidebar">
+                <h3>Book this Caterer</h3>
+                <p class="text-sm text-muted mb-4">Customize your menu during consultation.</p>
+                
+                <form action="{{ url_for('bookings.book') }}" method="GET">
+                    <input type="hidden" name="catering_id" value="{{ caterer.id }}">
+                    <button type="submit" class="btn btn-gold btn-block btn-large text-dark">Request Booking ➔</button>
+                </form>
+                
+                <div class="mt-4 pt-3 border-top">
+                    <h4>Direct Contact</h4>
+                    <p class="text-sm mt-2"><strong>📞</strong> +91-XXXXX-XXXXX (Vendor)</p>
+                    <p class="text-sm alert alert-info mt-2">Note: Final menu and pricing will be discussed post-booking request.</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}

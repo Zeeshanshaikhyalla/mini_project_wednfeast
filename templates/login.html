@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | Wed n Feast{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container">
+        <div class="auth-wrapper glass-panel">
+            <div class="auth-header">
+                <h2>Welcome Back</h2>
+                <p>Log in to access your bookings and dashboard.</p>
+            </div>
+            
+            <form action="{{ url_for('auth.login') }}" method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block btn-large mt-4">Log In</button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="{{ url_for('auth.register') }}">Sign up here</a></p>
+            </div>
+            
+            <div class="test-creds mt-4 p-3 bg-light" style="border-radius: 8px; font-size: 0.9em;">
+                <strong>Demo Credentials:</strong><br>
+                User: user@demo.com / password123<br>
+                Vendor: vendor@demo.com / password123
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
